@@ -7,14 +7,21 @@
 
 import UIKit
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+
+    // MARK: - Private Properties
+    private lazy var applicationCoordinator = ApplicationCoordinator(window: self.window!)
 
     func scene(_ scene: UIScene,
                willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
-        guard scene as? UIWindowScene != nil else { return }
+
+        guard let scene = (scene as? UIWindowScene) else { return }
+        self.window = UIWindow(windowScene: scene)
+
+        self.applicationCoordinator.start()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {}
