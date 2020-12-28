@@ -20,8 +20,10 @@ final class Router<EndPoint: EndPointType>: NetworkRouter {
             // MARK: - Temporary logger
             NetworkLogger.log(request: request)
             self.task = session.dataTask(with: request) { data, response, error in
-                NetworkLogger.log(response: response!)
-                completion(data, response, error)}
+                completion(data, response, error)
+                guard let response = response else { return }
+                NetworkLogger.log(response: response)
+            }
 
         } catch {
             completion(nil, nil, error)

@@ -41,7 +41,9 @@ final class TranslateProvider {
             }
             guard let translatedText = translation?.translatedText else { return }
             pair.destinationText = translatedText
-            self.delegate?.translateRetrieved(pair: pair)
+            DispatchQueue.main.async {
+                self.delegate?.translateRetrieved(pair: pair)
+            }
         }
     }
 
@@ -50,12 +52,13 @@ final class TranslateProvider {
 }
 
 extension TranslateProvider: ITranslateProvider {
-
+    // TODO: Возможно не очень подходящее название для метода.
     // MARK: - Public methods
     func addPair(pair: TranslationPair) {
 
         if let cashedPair = self.cashedPairs[pair.uuid] {
             if cashedPair.destinationText != nil {
+                // TODO: Кэширование сейчас не работает
                 self.delegate?.translateRetrieved(pair: cashedPair)
                 return
             }
