@@ -7,6 +7,10 @@
 
 import UIKit
 
+@objc protocol SwitchingLanguageDelegate: AnyObject {
+    func inputModeDidChange(_ notification: Notification)
+}
+
 final class TranslateUIViewController: UIViewController {
 
     // MARK: - Public properties
@@ -31,6 +35,9 @@ final class TranslateUIViewController: UIViewController {
     private lazy var translateView: ITranslateUIView? = TranslateUIView()
     private var requestTimer: Timer?
 
+    private var primaryLang: String? = "ru-RU"
+    private var isFirstEditing: Bool = true
+
     // MARK: - Initializer
     init(sourceLanguage: String? = nil,
          destinationLanguage: String,
@@ -51,8 +58,8 @@ final class TranslateUIViewController: UIViewController {
 
     // MARK: - Lifecycle
     override func loadView() {
-        translateView?.textViewDelegate = self
-
+        self.translateView?.textViewDelegate = self
+        self.translateView?.switchingLanguageDelegate = self
         self.view = (self.translateView as? UIView)
     }
 
@@ -88,6 +95,33 @@ extension TranslateUIViewController: UITextViewDelegate {
             // TODO: Стоит добавить визуальное отображение процесса загрузки.
             self.translationDelegate?.translationNeeded()
         })
+    }
+
+}
+
+// MARK: -
+extension TranslateUIViewController: SwitchingLanguageDelegate {
+
+    @objc func inputModeDidChange(_ notification: Notification) {
+        print("Пришло уведомление \(notification)")
+        guard let userInfo = notification.userInfo?["UITextInputFromInputModeKey"] as? UITextInputMode else { return }
+        guard let lang = userInfo.primaryLanguage else { return }
+
+        print("Старый язык \(lang), новый язык \(self.primaryLang!)")
+//        if !self.isFirstEditing {
+//            self.layoutIfNeeded()
+//            UIView.animate(withDuration: 0.4,
+//                           delay: 0.0,
+//                           options: [.curveEaseInOut, .allowUserInteraction],
+//                           animations: {
+//                            swap(&self.topTextview.text, &self.bottomTextView.text)
+//                            swap(&self.topTextview.backgroundColor, &self.bottomTextView.backgroundColor)
+//                            self.layoutIfNeeded()
+//                           },
+//                           completion: nil)
+//        }
+        self.primaryLang = lang
+        if self.isFirstEditing { self.isFirstEditing = false }
     }
 
 }

@@ -9,7 +9,8 @@ import UIKit
 
 protocol ITranslateUIView: AnyObject {
     var textViewDelegate: UITextViewDelegate? { get set }
-
+    // TODO: Вьюконтроллер стоит закрыть интерфейсом с нужным методом
+    var switchingLanguageDelegate: SwitchingLanguageDelegate? { get set }
     var sourceText: String? { get }
     var destinationText: String? { get set }
 }
@@ -19,6 +20,15 @@ final class TranslateUIView: UIView {
     // MARK: - Public properties
     weak var textViewDelegate: UITextViewDelegate? {
         didSet { self.topTextview.delegate = self.textViewDelegate }
+    }
+
+    weak var switchingLanguageDelegate: SwitchingLanguageDelegate? {
+        didSet {
+            NotificationCenter.default.addObserver(self.switchingLanguageDelegate!,
+                                                   selector: #selector(switchingLanguageDelegate?.inputModeDidChange),
+                                                   name: UITextInputMode.currentInputModeDidChangeNotification,
+                                                   object: topTextview.textInputMode)
+        }
     }
 
     // MARK: - Private properties
